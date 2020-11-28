@@ -29,58 +29,55 @@ var CLI struct {
 	} `cmd help:"Show the program version."`
 
 	Oauth struct {
-		ReadOnly bool `short:"r"  help:"Requests only read rights (no upload possible)."`
+		ReadOnly bool `short:"r" help:"Requests only read rights (no upload possible)."`
 		//-----------------
-		ClientFile string `arg type:"path"  help:"The identifier for a app, to use the google api."`
-		TokenFile  string `arg type:"path"  help:"Token for access to your gdrive."`
+		ClientFile string `arg type:"path" default:"client.json" help:"The identifier for a app, to use the google api."`
+		TokenFile  string `arg type:"path" default:"token.json"  help:"Token for access to your gdrive."`
 	} `cmd help:"Create the Google OAuth 2.0 files (ClientFile and TokenFile)."`
 
 	Keygen struct {
-		KeyFile string `arg type:"path"  help:"Path to the key file (must not exist)."`
+		KeyFile string `arg type:"path" default:"key.dat" help:"Path to the key file (must not exist)."`
 	} `cmd help:"Creates a new key file (used for file encryption)."`
 
 	Scan struct {
-		Force  bool `short:"f"  help:"Forces a scan even if the content has not changed."`
-		Bundle bool `short:"b"  help:"Bundles small files into large files for faster read access."`
+		Force    bool `short:"f" help:"Forces a scan even if the content has not changed."`
+		NoBundle bool `short:"b" help:"Bundles small files into large files for faster read access."`
 		//-----------------
-		KeyFile string `arg type:"existingfile"  help:"Path to the key file."`
-		DbFile  string `arg type:"path"          help:"Path to the db file."`
-		RootDir string `arg type:"existingdir"   help:"Path to the folder with the plain text files (becomes the root directory)"`
+		RootDir string `arg type:"path" default:"/data"      help:"Path to the folder with the plain text files (becomes the root directory)"`
+		DbFile  string `arg type:"path" default:"index.db2"  help:"Path to the db file."`
+		KeyFile string `arg type:"path" default:"key.dat"    help:"Path to the key file."`
 	} `cmd help:"Scan a folder and create/update an encrypted database file."`
 
 	Upload struct {
-		Force        bool `short:"f"  help:"Forces a scan/upload even if the content has not changed."`
-		Bundle       bool `short:"b"  help:"Bundles small files into large files for faster read access."`
-		SkipFullInit bool `short:"s"  help:"Accelerates the program start with many files. (Experimental!)"`
-		Cleanup      bool `short:"c"  help:"Deletes files that are no longer needed online after the upload. (WARNING: Do not use this mode regularly!)"`
-		TryCleanup   bool `short:"t"  help:"Switches the -c cleanup mode to 'log only' and does not delete any files."`
+		Force        bool   `short:"f" help:"Forces a scan/upload even if the content has not changed."`
+		NoBundle     bool   `short:"b" help:"Bundles small files into large files for faster read access."`
+		SkipFullInit bool   `short:"s" help:"Accelerates the program start with many files. (Experimental!)"`
+		Cleanup      bool   `short:"c" help:"Deletes files that are no longer needed online after the upload. (WARNING: Do not use this mode regularly!)"`
+		TryCleanup   bool   `short:"t" help:"Switches the -c cleanup mode to 'log only' and does not delete any files."`
+		FolderID     string `short:"i" help:"The google drive FolderID with the storage files. (default is 'root')"`
 		//-----------------
-		KeyFile string `arg type:"existingfile"  help:"Path to the key file."`
-		DbFile  string `arg type:"path"          help:"Path to the db file."`
-		RootDir string `arg type:"existingdir"   help:"Path to the folder with the plain text files (becomes the root directory)"`
-		//-----------------
-		ClientFile string `arg type:"existingfile"  help:"The identifier for a app, to use the google api."`
-		TokenFile  string `arg type:"existingfile"  help:"Token for access to your gdrive."`
-		CacheFile  string `arg type:"path"          help:"The online index file to speed up the program start."`
-		FolderID   string `arg                      help:"The google drive FolderID with the storage files (Default 'root')."`
+		RootDir    string `arg type:"path" default:"/data"       help:"Path to the folder with the plain text files (becomes the root directory)"`
+		DbFile     string `arg type:"path" default:"index.db2"   help:"Path to the db file."`
+		KeyFile    string `arg type:"path" default:"key.dat"     help:"Path to the key file."`
+		ClientFile string `arg type:"path" default:"client.json" help:"The identifier for a app, to use the google api."`
+		TokenFile  string `arg type:"path" default:"token.json"  help:"Token for access to your gdrive."`
+		CacheFile  string `arg type:"path" default:"cache.dat"   help:"The online index file to speed up the program start."`
 	} `cmd help:"Saves the local files encrypted in the online folder."`
 
 	Webdav struct {
-		LocalAddr      string `short:"l" default:":8080"  help:"The local server address like '1.2.3.4:8080' or '[::1]:443'."`
-		UseTLS         bool   `short:"t"  help:"Encrypt connection with TLS."`
-		Cert           string `short:"c" type:"Path to the server certificate."`
-		CertKey        string `short:"k" type:"Path to the server certificate key."`
-		UpdateInterval int    `short:"u" default:"300"  help:"The database is checked for changes every n seconds (default 300)."`
+		LocalAddr      string `short:"l" default:":8080" help:"The local server address like '1.2.3.4:8080' or '[::1]:443'."`
+		UseTLS         bool   `short:"t"                 help:"Encrypt connection with TLS."`
+		Cert           string `short:"c" type:"Path"     help:"Path to the server certificate."`
+		CertKey        string `short:"k" type:"Path"     help:"Path to the server certificate key."`
+		UpdateInterval int    `short:"u" default:"300"   help:"The database is checked for changes every n seconds (default 300)."`
+		CacheSizeMB    int    `short:"r" default:"500"   help:"The buffer in RAM enables high-performance random read access. (Don't use all of your memory!)"`
+		FolderID       string `short:"i"                 help:"The google drive FolderID with the storage files. (default is 'root')"`
 		//-----------------
-		KeyFile string `arg type:"existingfile"  help:"Path to the key file."`
-		//-----------------
-		ClientFile string `arg type:"existingfile"  help:"The identifier for a app, to use the google api."`
-		TokenFile  string `arg type:"existingfile"  help:"Token for access to your gdrive."`
-		CacheFile  string `arg type:"path"          help:"The online index file to speed up the program start."`
-		FolderID   string `arg                      help:"The google drive FolderID with the storage files (Default 'root')."`
-		//-----------------
-		UserFile    string `arg type:"existingfile"  help:"Path to the file with usernames and password hashes."`
-		CacheSizeMB int    `arg                      help:"The buffer in RAM enables high-performance random read access. (Don't use all of your memory!)"`
+		UserFile   string `arg type:"path" default:"webdav.users" help:"Path to the file with usernames and password hashes."`
+		KeyFile    string `arg type:"path" default:"key.dat"      help:"Path to the key file."`
+		ClientFile string `arg type:"path" default:"client.json"  help:"The identifier for a app, to use the google api."`
+		TokenFile  string `arg type:"path" default:"token.json"   help:"Token for access to your gdrive."`
+		CacheFile  string `arg type:"path" default:"cache.dat"    help:"The online index file to speed up the program start."`
 	} `cmd help:"Starts a WebDav server to access the files online."`
 }
 
@@ -97,27 +94,29 @@ func main() {
 	case "oauth":
 		_, err := gdrive.OAuth(CLI.Oauth.ClientFile, CLI.Oauth.TokenFile, CLI.Oauth.ReadOnly)
 		if err != nil {
-			panic(err)
+			fmt.Printf("[FATAL ERROR] %v\n", err)
+			os.Exit(21)
 		}
 		break
 
 	case "keygen":
 		err := enc.CreateKeyFile(CLI.Keygen.KeyFile)
 		if err != nil {
-			panic(err)
+			fmt.Printf("[FATAL ERROR] %v\n", err)
+			os.Exit(31)
 		}
 		break
 
 	case "scan":
 		debug := uint8(CLI.Debug)
 		a := CLI.Scan
-		upload(true, debug, false, "", "", a.KeyFile, "", "", a.DbFile, a.RootDir, a.Force, a.Bundle, false, true)
+		upload(true, debug, false, "", "", a.KeyFile, "", "", a.DbFile, a.RootDir, a.Force, !a.NoBundle, false, true)
 		break
 
 	case "upload":
 		debug := uint8(CLI.Debug)
 		a := CLI.Upload
-		upload(false, debug, a.SkipFullInit, a.ClientFile, a.TokenFile, a.KeyFile, a.FolderID, a.CacheFile, a.DbFile, a.RootDir, a.Force, a.Bundle, a.Cleanup, a.TryCleanup)
+		upload(false, debug, a.SkipFullInit, a.ClientFile, a.TokenFile, a.KeyFile, a.FolderID, a.CacheFile, a.DbFile, a.RootDir, a.Force, !a.NoBundle, a.Cleanup, a.TryCleanup)
 		break
 
 	case "webdav":
@@ -127,7 +126,8 @@ func main() {
 		break
 
 	default:
-		panic(fmt.Sprintf("command not implemented: '%s'", ctx.Command()))
+		fmt.Printf("[FATAL ERROR] command not implemented: '%s'\n", ctx.Command())
+		os.Exit(99)
 	}
 }
 
@@ -138,7 +138,8 @@ func upload(scanOnly bool, debugLvl uint8, skipFullInit bool, clientStr, tokenSt
 	// load keyfile
 	keyFile, err := enc.LoadKeyFile(keyStr)
 	if err != nil {
-		panic(err)
+		fmt.Printf("[FATAL ERROR] %v\n", err)
+		os.Exit(501)
 	}
 
 	// load db (if exist)
@@ -150,7 +151,8 @@ func upload(scanOnly bool, debugLvl uint8, skipFullInit bool, clientStr, tokenSt
 	// SCAN DIR
 	newDb, change, _, err := db.FromScan(rootStr, oldDb, debugLvl, keyFile)
 	if err != nil {
-		panic(err)
+		fmt.Printf("[FATAL ERROR] %v\n", err)
+		os.Exit(502)
 	}
 	if !change && !forceFlag {
 		// no change AND no upload-force
@@ -167,7 +169,8 @@ func upload(scanOnly bool, debugLvl uint8, skipFullInit bool, clientStr, tokenSt
 		// build oauth
 		oauth, err := gdrive.OAuth(clientStr, tokenStr, false)
 		if err != nil {
-			panic(err)
+			fmt.Printf("[FATAL ERROR] %v\n", err)
+			os.Exit(503)
 		}
 
 		// build service for upload
@@ -176,18 +179,21 @@ func upload(scanOnly bool, debugLvl uint8, skipFullInit bool, clientStr, tokenSt
 		// UPLOAD files & db
 		err = core.Upload(rootStr, newDb, keyFile.IndexKey(), service, debugLvl)
 		if err != nil {
-			panic(err)
+			fmt.Printf("[FATAL ERROR] %v\n", err)
+			os.Exit(504)
 		}
 
 		// unnecessary files online (optional)
 		if cleanUpFlag {
 			err = service.Update()
 			if err != nil {
-				panic(err)
+				fmt.Printf("[FATAL ERROR] %v\n", err)
+				os.Exit(505)
 			}
 			err = core.Clean(newDb, service, cleanUpSimulation, debugLvl)
 			if err != nil {
-				panic(err)
+				fmt.Printf("[FATAL ERROR] %v\n", err)
+				os.Exit(506)
 			}
 		}
 	}
@@ -196,7 +202,8 @@ func upload(scanOnly bool, debugLvl uint8, skipFullInit bool, clientStr, tokenSt
 	// save changed db local
 	err = db.ToFile(newDb, keyFile.IndexKey(), dbStr)
 	if err != nil {
-		panic(err)
+		fmt.Printf("[FATAL ERROR] %v\n", err)
+		os.Exit(507)
 	}
 }
 
@@ -208,13 +215,15 @@ func startWebdav(debugLvl uint8, clientStr, tokenStr, keyStr, folderId, cacheStr
 	// load keyfile
 	keyFile, err := enc.LoadKeyFile(keyStr)
 	if err != nil {
-		panic(err)
+		fmt.Printf("[FATAL ERROR] %v\n", err)
+		os.Exit(601)
 	}
 
 	// build oauth
 	oauth, err := gdrive.OAuth(clientStr, tokenStr, true)
 	if err != nil {
-		panic(err)
+		fmt.Printf("[FATAL ERROR] %v\n", err)
+		os.Exit(602)
 	}
 
 	// build sector cache for random read access

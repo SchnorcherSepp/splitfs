@@ -36,5 +36,13 @@ FROM ${DISTROLESS_IMAGE}
 # Copy our static executable
 COPY --from=builder /go/bin/app /go/bin/splitfs
 
-# Run the hello binary.
+# webdav server default port
+EXPOSE 8080
+
+# /config for default files (workdir)
+# /data for 'scan' and 'upload' (default root dir)
+VOLUME ["/config", "/data"]
+WORKDIR /config
+
+# Run the binary.
 ENTRYPOINT ["/go/bin/splitfs"]
