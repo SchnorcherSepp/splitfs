@@ -11,11 +11,14 @@ import (
 	interf "github.com/SchnorcherSepp/storage/interfaces"
 	"github.com/alecthomas/kong"
 	"github.com/mackerelio/go-osstat/memory"
+	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
+	"io/ioutil"
 	"os"
 	"path"
 	"runtime"
+	"strings"
 )
 
 // version is set by `go build`
@@ -79,6 +82,14 @@ var CLI struct {
 		TokenFile  string `arg type:"path" default:"token.json"   help:"Token for access to your gdrive."`
 		CacheFile  string `arg type:"path" default:"cache.dat"    help:"The online index file to speed up the program start."`
 	} `cmd help:"Starts a WebDav server to access the files online."`
+
+	Adduser struct {
+		UserFile string `short:"f" type:"path" default:"webdav.users" help:"Path to the file with usernames and password hashes."`
+		//-----------------
+		Username   string `arg help:"WebDav username (user must not yet exist)."`
+		Password   string `arg help:"Password (saved as a bcrypt hash)"`
+		PathPrefix string `arg help:"prefix for accessible resources (separated with ':')."`
+	} `cmd help:"Adds another webdav user to the user file."`
 }
 
 func main() {
@@ -123,6 +134,11 @@ func main() {
 		debug := uint8(CLI.Debug)
 		a := CLI.Webdav
 		startWebdav(debug, a.ClientFile, a.TokenFile, a.KeyFile, a.FolderID, a.CacheFile, a.LocalAddr, a.UserFile, a.CacheSizeMB, a.UseTLS, a.Cert, a.CertKey, a.UpdateInterval)
+		break
+
+	case "adduser":
+		a := CLI.Adduser
+		addUser(a.Username, a.Password, a.PathPrefix, a.UserFile)
 		break
 
 	default:
@@ -277,5 +293,50 @@ func checkFreeRam(cacheSizeMB int) {
 		_, _ = p.Printf("+ memory free: %d MB\n", freeMB)
 		_, _ = p.Printf("+ cache size: %d MB\n", cacheSizeMB)
 		_, _ = p.Printf("+ free memory after cache: %d MB\n", freeMB-cacheSizeMB)
+	}
+}
+
+func addUser(username, password, pathPrefix string, userFile string) {
+
+	// prepare username
+	username = strings.ReplaceAll(username, "\n", "") // remove new line
+	username = strings.ReplaceAll(username, "\t", "") // remove tab
+	username = strings.ReplaceAll(username, " ", "")  // remove space
+	username = strings.TrimSpace(username)            // trim space
+
+	// prepare password
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
+	if err != nil {
+		fmt.Printf("[FATAL ERROR] %v\n", err)
+		os.Exit(701)
+	}
+
+	// prepare prefix
+	strings.ReplaceAll(pathPrefix, "\n", "") // new line
+
+	//-------------------------------------------------------
+
+	var users string
+
+	// read user file
+	if _, err := os.Stat(userFile); err == nil {
+		// read all
+		b, err := ioutil.ReadFile(userFile)
+		if err != nil {
+			fmt.Printf("WARNING: %v\n", err)
+		} else {
+			users = string(b)
+		}
+	}
+
+	// add
+	line := username + ":" + string(hash) + ":" + pathPrefix
+	users += "\n" + line
+
+	// write file
+	err = ioutil.WriteFile(userFile, []byte(users), 0600)
+	if err != nil {
+		fmt.Printf("[FATAL ERROR] %v\n", err)
+		os.Exit(702)
 	}
 }
