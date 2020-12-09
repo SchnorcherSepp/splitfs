@@ -74,13 +74,13 @@ var CLI struct {
 		TokenFile  string `short:"t" type:"path" default:"token.json"   help:"Token for access to your gdrive."`
 		CacheFile  string `short:"a" type:"path" default:"cache.dat"    help:"The online index file to speed up the program start."`
 		// optional
-		CacheSizeMB    int    `short:"m" default:"500"   help:"The buffer in RAM enables high-performance random read access. (Don't use all of your memory!)"`
-		LocalAddr      string `short:"l" default:":8080" help:"The local server address like '1.2.3.4:8080' or '[::1]:443'."`
-		FolderID       string `short:"i" default:"root"  help:"The google drive FolderID with the storage files."`
-		UseTLS         bool   `short:"e"                 help:"Encrypt connection with TLS."`
-		Cert           string `short:"q" type:"Path"     help:"Path to the server certificate."`
-		CertKey        string `short:"p" type:"Path"     help:"Path to the server certificate key."`
-		UpdateInterval int    `short:"x" default:"300"   help:"The database is checked for changes every n seconds."`
+		CacheSizeMB    int    `short:"m" default:"500"           help:"The buffer in RAM enables high-performance random read access. (Don't use all of your memory!)"`
+		LocalAddr      string `short:"l" default:":8080"         help:"The local server address like '1.2.3.4:8080' or '[::1]:443'."`
+		FolderID       string `short:"i" default:"root"          help:"The google drive FolderID with the storage files."`
+		UseTLS         bool   `short:"e"                         help:"Encrypt connection with TLS."`
+		Cert           string `short:"q" default:"fullchain.pem" help:"Path to the server certificate."`
+		CertKey        string `short:"p" default:"privkey.pem"   help:"Path to the server certificate key."`
+		UpdateInterval int    `short:"x" default:"300"           help:"The database is checked for changes every n seconds."`
 	} `cmd help:"Starts a WebDav server to access the files online."`
 
 	Adduser struct {
@@ -255,7 +255,7 @@ func startWebdav(debugLvl uint8, clientStr, tokenStr, keyStr, folderId, cacheStr
 	fs := webdav.NewFileSystem(service, keyFile.IndexKey(), debugLvl, updateInterval)
 	err = webdav.Serve(lAddr, useTLS, certStr, certKeyStr, fs, userDbStr, debugLvl)
 	if err != nil {
-		println(err) // SOFT FAIL
+		fmt.Printf("[DEBUG] %v\n", err) // SOFT FAIL
 	}
 }
 
