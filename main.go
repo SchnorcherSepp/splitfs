@@ -32,63 +32,63 @@ var CLI struct {
 	} `cmd help:"Show the program version."`
 
 	Oauth struct {
+		ClientFile string `short:"c" type:"path" default:"client.json" help:"The identifier for a app, to use the google api."`
+		TokenFile  string `short:"t" type:"path" default:"token.json"  help:"Token for access to your gdrive."`
+		// optional
 		ReadOnly bool `short:"r" help:"Requests only read rights (no upload possible)."`
-		//-----------------
-		ClientFile string `arg type:"path" default:"client.json" help:"The identifier for a app, to use the google api."`
-		TokenFile  string `arg type:"path" default:"token.json"  help:"Token for access to your gdrive."`
 	} `cmd help:"Create the Google OAuth 2.0 files (ClientFile and TokenFile)."`
 
 	Keygen struct {
-		KeyFile string `arg type:"path" default:"key.dat" help:"Path to the key file (must not exist)."`
+		KeyFile string `short:"k" type:"path" default:"key.dat" help:"Path to the key file (must not exist)."`
 	} `cmd help:"Creates a new key file (used for file encryption)."`
 
 	Scan struct {
+		RootDir string `short:"o" type:"path" default:"/data"     help:"Path to the folder with the plain text files (becomes the root directory)"`
+		DbFile  string `short:"d" type:"path" default:"index.db2" help:"Path to the db file."`
+		KeyFile string `short:"k" type:"path" default:"key.dat"   help:"Path to the key file."`
+		// optional
 		Force    bool `short:"f" help:"Forces a scan even if the content has not changed."`
-		NoBundle bool `short:"b" help:"Bundles small files into large files for faster read access."`
-		//-----------------
-		RootDir string `arg type:"path" default:"/data"      help:"Path to the folder with the plain text files (becomes the root directory)"`
-		DbFile  string `arg type:"path" default:"index.db2"  help:"Path to the db file."`
-		KeyFile string `arg type:"path" default:"key.dat"    help:"Path to the key file."`
+		NoBundle bool `short:"n" help:"Bundles small files into large files for faster read access."`
 	} `cmd help:"Scan a folder and create/update an encrypted database file."`
 
 	Upload struct {
+		RootDir    string `short:"o" type:"path" default:"/data"       help:"Path to the folder with the plain text files (becomes the root directory)"`
+		DbFile     string `short:"d" type:"path" default:"index.db2"   help:"Path to the db file."`
+		KeyFile    string `short:"k" type:"path" default:"key.dat"     help:"Path to the key file."`
+		ClientFile string `short:"c" type:"path" default:"client.json" help:"The identifier for a app, to use the google api."`
+		TokenFile  string `short:"t" type:"path" default:"token.json"  help:"Token for access to your gdrive."`
+		CacheFile  string `short:"a" type:"path" default:"cache.dat"   help:"The online index file to speed up the program start."`
+		// optional
 		Force        bool   `short:"f" help:"Forces a scan/upload even if the content has not changed."`
-		NoBundle     bool   `short:"b" help:"Bundles small files into large files for faster read access."`
+		NoBundle     bool   `short:"n" help:"Bundles small files into large files for faster read access."`
 		SkipFullInit bool   `short:"s" help:"Accelerates the program start with many files. (Experimental!)"`
-		Cleanup      bool   `short:"c" help:"Deletes files that are no longer needed online after the upload. (WARNING: Do not use this mode regularly!)"`
-		TryCleanup   bool   `short:"t" help:"Switches the -c cleanup mode to 'log only' and does not delete any files."`
-		FolderID     string `short:"i" help:"The google drive FolderID with the storage files. (default is 'root')"`
-		//-----------------
-		RootDir    string `arg type:"path" default:"/data"       help:"Path to the folder with the plain text files (becomes the root directory)"`
-		DbFile     string `arg type:"path" default:"index.db2"   help:"Path to the db file."`
-		KeyFile    string `arg type:"path" default:"key.dat"     help:"Path to the key file."`
-		ClientFile string `arg type:"path" default:"client.json" help:"The identifier for a app, to use the google api."`
-		TokenFile  string `arg type:"path" default:"token.json"  help:"Token for access to your gdrive."`
-		CacheFile  string `arg type:"path" default:"cache.dat"   help:"The online index file to speed up the program start."`
+		Cleanup      bool   `short:"l" help:"Deletes files that are no longer needed online after the upload. (WARNING: Do not use this mode regularly!)"`
+		TryCleanup   bool   `short:"y" help:"Switches the -c cleanup mode to 'log only' and does not delete any files."`
+		FolderID     string `short:"i" default:"root" help:"The google drive FolderID with the storage files."`
 	} `cmd help:"Saves the local files encrypted in the online folder."`
 
 	Webdav struct {
+		UserFile   string `short:"u" type:"path" default:"webdav.users" help:"Path to the file with usernames and password hashes."`
+		KeyFile    string `short:"k" type:"path" default:"key.dat"      help:"Path to the key file."`
+		ClientFile string `short:"c" type:"path" default:"client.json"  help:"The identifier for a app, to use the google api."`
+		TokenFile  string `short:"t" type:"path" default:"token.json"   help:"Token for access to your gdrive."`
+		CacheFile  string `short:"a" type:"path" default:"cache.dat"    help:"The online index file to speed up the program start."`
+		// optional
+		CacheSizeMB    int    `short:"m" default:"500"   help:"The buffer in RAM enables high-performance random read access. (Don't use all of your memory!)"`
 		LocalAddr      string `short:"l" default:":8080" help:"The local server address like '1.2.3.4:8080' or '[::1]:443'."`
-		UseTLS         bool   `short:"t"                 help:"Encrypt connection with TLS."`
-		Cert           string `short:"c" type:"Path"     help:"Path to the server certificate."`
-		CertKey        string `short:"k" type:"Path"     help:"Path to the server certificate key."`
-		UpdateInterval int    `short:"u" default:"300"   help:"The database is checked for changes every n seconds (default 300)."`
-		CacheSizeMB    int    `short:"r" default:"500"   help:"The buffer in RAM enables high-performance random read access. (Don't use all of your memory!)"`
-		FolderID       string `short:"i"                 help:"The google drive FolderID with the storage files. (default is 'root')"`
-		//-----------------
-		UserFile   string `arg type:"path" default:"webdav.users" help:"Path to the file with usernames and password hashes."`
-		KeyFile    string `arg type:"path" default:"key.dat"      help:"Path to the key file."`
-		ClientFile string `arg type:"path" default:"client.json"  help:"The identifier for a app, to use the google api."`
-		TokenFile  string `arg type:"path" default:"token.json"   help:"Token for access to your gdrive."`
-		CacheFile  string `arg type:"path" default:"cache.dat"    help:"The online index file to speed up the program start."`
+		FolderID       string `short:"i" default:"root"  help:"The google drive FolderID with the storage files."`
+		UseTLS         bool   `short:"e"                 help:"Encrypt connection with TLS."`
+		Cert           string `short:"q" type:"Path"     help:"Path to the server certificate."`
+		CertKey        string `short:"p" type:"Path"     help:"Path to the server certificate key."`
+		UpdateInterval int    `short:"x" default:"300"   help:"The database is checked for changes every n seconds."`
 	} `cmd help:"Starts a WebDav server to access the files online."`
 
 	Adduser struct {
-		UserFile string `short:"f" type:"path" default:"webdav.users" help:"Path to the file with usernames and password hashes."`
-		//-----------------
 		Username   string `arg help:"WebDav username (user must not yet exist)."`
 		Password   string `arg help:"Password (saved as a bcrypt hash)"`
 		PathPrefix string `arg help:"prefix for accessible resources (separated with ':')."`
+		// optional
+		UserFile string `short:"u" type:"path" default:"webdav.users" help:"Path to the file with usernames and password hashes."`
 	} `cmd help:"Adds another webdav user to the user file."`
 }
 
