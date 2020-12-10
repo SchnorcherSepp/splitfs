@@ -8,10 +8,12 @@ package webdav
 */
 
 import (
+	"crypto/tls"
 	"golang.org/x/net/webdav"
 	"log"
 	"net"
 	"net/http"
+	"time"
 )
 
 // ServeTLS accepts incoming HTTPS connections on the listener,
@@ -44,24 +46,45 @@ func Serve(lAddr string, useTls bool, certFile string, certKeyFile string, fs we
 	// Tell the user the port in which is listening.
 	log.Printf("INFO: %s/Serve: Listening on %s", packageName, listener.Addr().String())
 
-	// cfg
-	cfg := newConfig(fs, userFile, debugLvl)
+	// handler
+	handler := newConfig(fs, userFile, debugLvl)
 
 	// Starts the server.
-	if useTls {
-		log.Printf("INFO: %s/Serve: start with TLS ...", packageName)
-		if err := http.ServeTLS(listener, cfg, certFile, certKeyFile); err != nil {
-			// ServeTLS always returns a non-nil error.
-			log.Printf("ERROR: %s/ServeTLS: %v", packageName, err)
-			return err
-		}
-	} else {
+	if !useTls { //------------------------------------------------------------------
 		log.Printf("INFO: %s/Serve: start ...", packageName)
-		if err := http.Serve(listener, cfg); err != nil {
+		if err := http.Serve(listener, handler); err != nil {
 			// Serve always returns a non-nil error.
 			log.Printf("ERROR: %s/Serve: %v", packageName, err)
 			return err
 		}
-	}
+
+	} else { //----------------------------------------------------------------------
+		log.Printf("INFO: %s/Serve: start with TLS ...", packageName)
+
+		// server hardening
+		// https://blog.cloudflare.com/exposing-go-on-the-internet/
+		srv := &http.Server{
+			// Timeouts
+			IdleTimeout: 120 * time.Second,
+			// TLS config
+			TLSConfig: &tls.Config{
+				// disable TLS 1.0 and TLS 1.1
+				MinVersion: tls.VersionTLS12,
+				// Causes servers to use Go's default ciphersuite preferences,
+				// which are tuned to avoid attacks. Does nothing on clients.
+				PreferServerCipherSuites: true,
+			},
+			// handler (@see webdav/config.go)
+			Handler: handler,
+		}
+
+		// server
+		if err := srv.ServeTLS(listener, certFile, certKeyFile); err != nil {
+			// ServeTLS always returns a non-nil error.
+			log.Printf("ERROR: %s/ServeTLS: %v", packageName, err)
+			return err
+		}
+	} //-----------------------------------------------------------------------------
+
 	return nil
 }
