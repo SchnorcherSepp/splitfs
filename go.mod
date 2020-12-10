@@ -8,6 +8,6 @@ require (
 	github.com/klauspost/compress v1.11.3
 	github.com/mackerelio/go-osstat v0.1.0
 	golang.org/x/crypto v0.0.0-20201208171446-5f87f3452ae9
-	golang.org/x/net v0.0.0-20201207224615-747e23833adb
+	golang.org/x/net v0.0.0-20201209123823-ac852fbbde11
 	golang.org/x/text v0.3.4
 )

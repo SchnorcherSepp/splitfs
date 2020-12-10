@@ -196,11 +196,20 @@ func (c *_Config) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			info, err := c.webdavHandler.FileSystem.Stat(context.TODO(), r.URL.Path)
 			// file is dir?
 			if err == nil && info.IsDir() {
+
+				// html hook
+				// example: "http://server:8080/Folder/?html"
+				if r.URL.RawQuery == "html" {
+					htmlHook(w, r.URL.Path, c.webdavHandler.FileSystem) // HTML VIEW
+					return                                              // -> EXIT
+				}
+
 				// resource is an collection -> change request to 'PROPFIND'
 				r.Method = "PROPFIND"
 				if r.Header.Get("Depth") == "" {
 					r.Header.Add("Depth", "1")
 				}
+
 			}
 		}
 
