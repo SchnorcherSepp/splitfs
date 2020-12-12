@@ -16,7 +16,7 @@ import (
 	"golang.org/x/text/message"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
 )
@@ -98,7 +98,7 @@ func main() {
 	switch ctx.Selected().Name {
 
 	case "version":
-		fmt.Printf("%s %s\n", path.Base(os.Args[0]), version)
+		fmt.Printf("%s %s\n", filepath.Base(os.Args[0]), version)
 		fmt.Printf("%s %s/%s (%s)\n", runtime.Version(), runtime.GOOS, runtime.GOARCH, runtime.Compiler)
 		break
 
