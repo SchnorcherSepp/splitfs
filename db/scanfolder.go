@@ -139,7 +139,7 @@ func FromScan(rootPath string, oldDB Db, debugLvl uint8, keyFile *enc.KeyFile) (
 
 	// statistic
 	summary = fmt.Sprintf("SCAN: error=%v, sum=%d, changed=%v, newOrUpdate=%d, removed=%d", retErr, len(newDB.VFiles), changed, countNewOrUpdate, len(oldDB.VFiles))
-	if debug {
+	if debug && changed {
 		log.Printf("DEBUG: %s/ScanFolder: %s", packageName, summary)
 	}
 	return
