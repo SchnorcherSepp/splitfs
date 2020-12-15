@@ -65,7 +65,9 @@ func Serve(lAddr string, useTls bool, certFile string, certKeyFile string, fs we
 		// https://blog.cloudflare.com/exposing-go-on-the-internet/
 		srv := &http.Server{
 			// Timeouts
-			IdleTimeout: 120 * time.Second,
+			ReadTimeout:  5 * time.Second,
+			WriteTimeout: 10 * time.Second,
+			IdleTimeout:  120 * time.Second,
 			// TLS config
 			TLSConfig: &tls.Config{
 				// disable TLS 1.0 and TLS 1.1
