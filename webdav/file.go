@@ -75,7 +75,9 @@ func (f *_File) Read(p []byte) (n int, err error) {
 	}
 
 	// lag fix?
-	_, _ = f.innerReader.ReadAt(lagBuffer, f.innerOff) // TODO: WTF!
+	go func() {
+		_, _ = f.innerReader.ReadAt(lagBuffer, f.innerOff) // TODO: WTF!
+	}()
 
 	// return
 	n, err = f.innerReader.ReadAt(p, f.innerOff)
