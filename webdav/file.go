@@ -17,6 +17,7 @@ import (
 )
 
 var _ webdav.File = (*_File)(nil)
+var lagBuffer = make([]byte, 50*1024*1024) // TODO: WTF!
 
 // _File is returned by a FileSystem's OpenFile method and can be served by a Handler.
 type _File struct {
@@ -72,6 +73,9 @@ func (f *_File) Read(p []byte) (n int, err error) {
 		}
 		f.innerReader = rAt
 	}
+
+	// lag fix?
+	_, _ = f.innerReader.ReadAt(lagBuffer, f.innerOff) // TODO: WTF!
 
 	// return
 	n, err = f.innerReader.ReadAt(p, f.innerOff)
